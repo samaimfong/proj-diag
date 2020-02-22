@@ -1,14 +1,39 @@
 // import Promise from "bluebird";
 const AppDAO = require("./dao");
-//const StateRepository = require("./StateTouches_repository");
+const StateRepository = require("./StateTouches_repository");
 
 function main() {
-  console.log("Enter Main");
+  console.log("Enter main() function:");
   const dao = new AppDAO();
   dao
     .connect(":memory:")
     // .connect()
-    .then(result => console.log("result of connect:", result))
+    .then(
+      // const sLogic = new StateRepository();
+      // result => console.log("result of connect:", result)
+      function(result) {
+        console.log("result of connect:", result);
+        const s = new StateRepository(dao);
+        s.createTable()
+          .then(function(result) {
+            console.log("result of create table:", result);
+            s.loaddata()
+              .then(function(result) {
+                console.log(
+                  "data load complete with record count of :",
+                  result
+                );
+                s.all("select * from StateTouches limit 10;")
+                  .then(function(result) {
+                    console.log(result);
+                  })
+                  .catch(err => console.log("error : ", err.message));
+              })
+              .catch(err => console.log("error : ", err.message));
+          })
+          .catch(err => console.log("error : ", err.message));
+      }
+    )
     .catch(err => console.log("error : ", err.message));
   /*   const dao = new AppDAO(':memory:')
   const s = new StateRepository(dao)
